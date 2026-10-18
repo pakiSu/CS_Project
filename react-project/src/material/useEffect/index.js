@@ -60,48 +60,84 @@ const useStyles = makeStyles(theme => ({
     
     useEffect vs useLayoutEffect
         对比	        useEffect	                useLayoutEffect
-        执行时机	     DOM 绘制后（异步）	       DOM 绘制前（同步）
+        执行时机	     DOM 绘制后（异步）	       DOM 绘制前（同步）,虚拟 DOM
         是否阻塞渲染	 不阻塞	                   阻塞
         适用场景	     数据请求、订阅、定时器	    测量 DOM、防止闪烁
-*/
+
+    useLayoutEffect 会阻止浏览器渲染真实 DOM， 优先执行 Effect 链表中的 callbacl 方法
+    useEffect 不会阻止浏览器渲染真实 DOM, 在渲染真是 DOM 时也会执行 Effect 链表中的 callback 方法
+        -- useLayoutEffect 设置的 callback 会优先与 useEffect 设置 callbacl 执行
+        -- 在两者设置的 callback 中，依然可以获取 DOM 原因【原因：真是的 DOM 对象已经创建了，区别只是柳然其是否渲染】
+        -- 如果在 callback 函数中又修改了状态值【试图又要更新】
+            + useEffect：浏览器肯定是把第一次的真实 DOM 已经绘制了，再去渲染第二次真实 DOM,所以会有闪烁现象
+            + useLayoutEffect：浏览器是把两次真实 DOM 的渲染，合并在一起渲染
+    
+    视图更新步骤:
+        1. 第一步：基于 babel-preset-react-app 把 JSX 转换为 React.createElement() 格式
+        2. 第二步：把 React.createElement() 执行，创建出 virtualDOM
+        3. 第三步：基于 root.render 方法把 virtualDOM 【 Diff 算法 】变为真实 DOM 对象- 【 useLayoutEffect 执行  】
+            -- useLayoutEffect 会阻止第四步操作， 先执行 Effect 链表中的 callbacl 方法 【同步操作】
+            -- useEffect 第四步操作和 Effect 链表中的 callback 方法执行，是同时进行的 【异步操作  】
+        4. 第四步：浏览器绘制和渲染 真实 DOM 对象 - 【 useEffect 执行    】
+*/            
 
 
 
-export const UseEffectDemo = () => {
+export const UseEffectDemo = (props) => {
     console.log("UseEffectDemo render...");
 
     const [count, SetCount] = useState(0);
     const [data, SetData] = useState('');
     const classes = useStyles();
 
-    /* 
-        1. 传空数组 [] —— 只在组件挂载时执行一次 >> 相当于 componentDidMount 生命周期， 
-        2. 只有组件重新挂载（unmount 后再 mount）时才会再执行一次
+     /* useEffect(callback) -- 没设置依赖
+        + 第一次渲染完毕后，执行 callback， 等价于 componentDidMount
+        + 在组件每一次更新完毕后，也会执行 callback， 等价于 componentDidUpdate
     */
-    useEffect( () => {
-        console.log('useEffect: 依赖是空 []');
-        //无依赖副作用： 
-        const timer = setInterval(() => {}, 1000);
-        return () => {
-            // 当组件卸载: 会先调用清理函数
-            console.log('清除副作用');
-            clearInterval(timer); //清除副作用
-        }
-    }, [])
-
-    /* 不传依赖数组 —— 每次渲染后都执行  */
     useEffect( () => {
         console.log('useEffect: 无依赖');
     })
 
-    /* 传具体依赖 —— 依赖变化时执行 >> 相当于 componentDidUpdate 生命周期 */
+    /* useEffect(callback, []) -- 设置了，但是无依赖
+        1. 只有第一次渲染完毕后，才会执行 callback，每一次视图更新完毕后，callback 都不会再执行
+        2. 类似于 componentDidMount 生命周期
+        3. 只有组件重新挂载（unmount 后再 mount）时才会再执行一次
+    */
+
+     useEffect( () => {
+        console.log('useEffect: 依赖是空 []');
+    }, [])
+    
+
+    /* useEffect(()=> { return ()=> {
+                1. 返回的小函数，会在组件释放的时候执行
+                2. 如果组件更新，会把上一次返回的小函数执行 【可以 “理解为” 上一次渲染的组件释放了】
+            }
+        }，[xx])
+
+    */
     useEffect( () => {
-        console.log('useEffect: 依赖 count');
-        //依赖副作用： 
+        console.log('清除副作用');
+        //无依赖副作用： 
         const timer = setInterval(() => {}, 1000);
         return () => {
-            console.log('依赖变化会会清楚清除前一次副作用');
-            clearInterval(timer); //依赖变化会会清楚清除前一次副作用
+            // 当组件卸载: 会先调用清理函数
+            clearInterval(timer); //清除副作用
+        }
+    }, [])
+
+    /* useEffect(callback, [依赖状态(多个状态)])
+        1. 第一次渲染完毕后，执行 callback
+        2. 当依赖的状态值【或者多个状态值中的一个】f发生变化时，才会触发 callback 执行
+        3. 但是依赖的状态值没有发生变化，在组件更新时，callback 不会执行
+    */
+    useEffect( () => {
+        console.log('useEffect: 依赖 count', count);
+         const timer = setInterval(() => {}, 1000);
+        return () => {
+            // 当组件卸载: 会先调用清理函数
+            console.log('有依赖：清除副作用', count);  //每次更新 count 获取的 是上次 count 的值
+            clearInterval(timer); //清除副作用
         }
     }, [count])
 

@@ -163,7 +163,7 @@ const ChildComponent = memo(props => {
 
 
 
-/* memo 化的自定义 Hook  */
+/* memo 化的自定义 Hook: 必须以 use 开头且开放在头部，不在存在 if 和 for 语句内  */
 function useFilteredList(list, keyword) {
   return useMemo(() => {
     console.log('过滤执行');
