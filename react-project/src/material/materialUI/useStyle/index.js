@@ -9,6 +9,8 @@ import { makeStyles, styled, withStyles } from "@material-ui/styles"
         -- options.defaultTheme（Object [optional]）：如果 Theme Provider 为给与任何主题，则会应用默认主题。
         -- options.name (String [optional]): 样式表的名称。 适合调试。
         -- options.flip (Boolean [optional])：当设置为 false 时，此表单将选择退出 rtl 转换。 如果设置为 true时，则会反转样式。 当设置为 null，它依据 theme.direction 而定。
+
+    3. 只能用于【函数组件】
 */
 const useStyle =  makeStyles(theme => ({
     root: {
@@ -146,6 +148,8 @@ function styledCustom(Component) {
     4. withStyles(styles)(component) 会把生成的 classes 作为一个 prop 传给 Component
         -- 自定义组件生成的 css 的规则： [组件名称]-[样式规则名称]-[UUID]            --> ChildComponent1-root-uuid
         -- Material-UI 组件生成的 css 的规则： Mui[组件名称]-[样式规则名称]-[UUID]  --> MuiButton-root-uuid
+
+    5. 适用【函数组件】和【类组件】
 */
 function ChildComponent1(props) {
     const { classes } = props;

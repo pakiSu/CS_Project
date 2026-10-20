@@ -8,10 +8,11 @@ import  WithWidthTest from './materialUI/withWidth';
 import { UsecontextTest, UseConsumerTest } from './useContext';
 import UsecontextClassTest from './useContext';
 import { ContextConsumer } from '../context';
-import { UseRefTest } from './useRef';
+import { UseRefTest, RefClassTest } from './useRef';
 import { UseStateTest, UseStateTest1, UseStateTest2, UseStateTest3, UseStateTest4 } from './useState';
 import { CustomHookTest } from "./customHook";
-
+import { UseStateDemo } from "./useState/index1";
+import  VoteClass  from "./componet-communication/class/vote";
 
 
 function MaterralTest(props) {
@@ -24,9 +25,12 @@ function MaterralTest(props) {
             <UseStateTest3 {...props} />
             <UseStateTest4 x={5} y={10} /> */}
 
+            {/* <UseStateDemo {...props}/> */}
+
             {/* <UseEffectDemo {...props}/> */}
 
             {/* <UseRefTest {...props}/> */}
+            {/* <RefClassTest {...props} /> */}
 
             {/* <UseMemoTest {...props} />
             <UseMemoTest1 {...props} /> */}
@@ -48,7 +52,10 @@ function MaterralTest(props) {
             }</ContextConsumer>
             <UsecontextClassTest {...props} /> */}
 
-            <CustomHookTest {...props}/>
+            {/* <CustomHookTest {...props}/> */}
+
+            {/* component communication */}
+            <VoteClass {...props}/>
         </React.Fragment>
     )
 }

@@ -1,5 +1,80 @@
 import { Button, Typography } from "@material-ui/core"
-import { Component, createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+import React, { Component, createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+
+
+
+/* 
+    类组件中，我们基于 ref 可以做的事情：
+        1. 赋值给一个标签：获取 DOM 元素
+        2. 赋值给一个类子组件：获取子组件实例【可以基于实例调用子组件中的属性和方法等】
+        3. 赋值给一个函数子组件：报错 【需要配合 React.forward 实现 ref 转发，获取子组件中某一个 DOM 元素】
+        4. 赋值给一个函数子组件：报错 【需要配合 React.forward 实现 ref 转发，获取子组件中通过 useImperativeHandle 获取函数子组件内部的状态或者方法】
+    
+        类组件获取 ref 使用方法：
+        1. ref='box'
+            this.refs.box获取 (不推荐使用}
+        2. ref={x=>this.box=x}
+            this.box 获取
+        3.this.box=React.createRef() 创建一个 ref 对象
+            <h2 ref={this.box}>
+            this.box.current 获取DOM元素 
+    
+    受控组件：基于修改数据/状态，让视图更新，达到需要的效果「推荐」
+    非受控组件：基于ref获取DOM元素，我们操作DOM元素，来实现需求和效果「偶尔」
+        基于 ref 获取 DOM 元素的语法
+            1.给需要获取的元素设置 ref='xxx'，后期基于 this.refs.xxx 去获取相应的DoM元素「不推荐使用：在 React.StrictMode 模式下会报错」
+                -- <h2 ref="titleBox">..</h2>
+                -- 获取: this.refs.titleBox
+
+            2.把 ref 属性值设置为一个函数
+                -- ref={x=> this.xxx=x}
+                    ++ x 是函数的形参：存储的就是当前 DOM 元素
+                    ++ 然后我们获取的 DOM 元素 “x” 直接挂在到实例的某个属性上（例如：refBox）
+                -- 获取：this.xxx
+
+            3.基于 React.createRef() 方法创建一个 REF 对象
+                -- this.xxx=React.createRef();//=> this.xxx={current:null}
+                -- ref={ REF对象（this.xxx)}
+                -- 获取:this.xxx.current
+            
+            原理：在 render 渲染的时候，会获取 virtualDoM 的 ref 属性
+                -- 如果属性值是一个字符串，则会给 this.refs 增加这样的一个成员，成员值就是当前的 DoM 元素
+                -- 如果属性值是一个函数，则会把函数执行，把当前 DOM 元素传递给这个函数「x->DOM 元素」，而在函数执行的内部，
+                -- 我们一般都会把 DOM 元素直接挂在到实例的某个属性上
+                -- 如果属性值是一个 REF 对象，则会把 DoM 元素赋值给对象的 current 属性
+*/
+export class RefClassTest extends React.Component {
+
+    refBox1= React.createRef();
+    refBox3= React.createRef();
+    refBox4= React.createRef();
+
+    render() {
+        return <>
+            <Typography variant="h4" component="h5" ref="typography">类组件 Refs</Typography>
+            <Typography variant="h4" component="h5" ref={ x => this.refBox = x }>类组件 Ref 函数</Typography>
+            <Typography variant="h4" component="h5" ref={ this.refBox1 }>类组件 createRef</Typography>
+            {/* 父组件是函数组件调用的子组件是：类组件 - 类的实列 */}
+            <ChildClass ref={ x => this.refBox2 = x }/>
+            {/* 父组件是函数组件调用的子组件是：函数组件 - 获取 DOM */}
+            <ChildFunction ref={ this.refBox3 }/>
+            {/* 父组件是函数组件调用的子组件是：函数组件 - 获取 状态和方法*/}
+            <ChildFunction1 ref={ this.refBox4 }/>
+        </>
+    }
+
+    componentDidMount() {
+        // 第一次渲染完毕【virtualDOM】已经变为真实 【DOM】：此时我们可以获取需要操作的 DOM 元素
+        console.log("refs: ", this.refs.typography);
+        console.log("Ref 函数: ", this.refBox);
+        console.log("createRef: ", this.refBox1.current);
+
+        console.log("子组件(类组件)实列：", this.refBox2);
+        console.log("子组件(函数组件)的DOM：", this.refBox3.current);
+        console.log("子组件(函数组件)的状态和方法：", this.refBox4.current);
+    }
+}
+
 
 
 /* useRef
@@ -7,23 +82,13 @@ import { Component, createRef, forwardRef, useEffect, useImperativeHandle, useRe
     2. 它和 useState 很像，都可以保存数据，但有一个关键区别：
         -- useState：修改状态会触发组件重新渲染。
         -- useRef：修改 ref.current 不会触发组件重新渲染。
-*/
-
-/* 
-    类组件中，我们基于 ref 可以做的事情：
+    
+    函数组件中，我们基于 Ref 可以做的事情：
         1. 赋值给一个标签：获取 DOM 元素
         2. 赋值给一个类子组件：获取子组件实例【可以基于实例调用子组件中的属性和方法等】
         3. 赋值给一个函数子组件：报错 【需要配合 React.forward 实现 ref 转发，获取子组件中某一个 DOM 元素】
-
-    类组件获取 ref 使用方法：
-        1. ref='box'
-            this.refs.box获取 (不推荐使用}
-        2. ref={x=>this.box=x}
-            this.box 获取
-        3.this.box=React.createRef() 创建一个 ref 对象
-            <h2 ref={this.box}>
-            this.box.current 获取DOM元素
-    
+        4. 赋值给一个函数子组件：报错 【需要配合 React.forward 实现 ref 转发，获取子组件中通过 useImperativeHandle 获取函数子组件内部的状态或者方法】
+        
     函数组件获取 ref 使用方法：
         1. ref={x=>this.box=x}
             this.box 获取
@@ -34,7 +99,6 @@ import { Component, createRef, forwardRef, useEffect, useImperativeHandle, useRe
             <h2 ref={this.box}>
              box.current 获取DOM元素
 */
-
 let prev1, prev2;
 export const UseRefTest = (props) => {
     let [num, setNum] = useState(0);
@@ -104,6 +168,8 @@ export const UseRefTest = (props) => {
         </div>
     )
 }
+
+
 
 /* 基于 ref 获取子组件(类组件)的实列，这样基于实例，可以调用组件内部挂载到实列上的东西 */
 class ChildClass extends Component {
