@@ -123,7 +123,7 @@ class ChildClassComponent extends PureComponent {
 
 /* 
     const xxx= useCallback(callback,[dependencies])
-        1. 组件第一次渲染，useCallbac k执行，创建一个函数 “callback”，赋值给 xxx
+        1. 组件第一次渲染，useCallback 执行，创建一个函数 “callback”，赋值给 xxx
         2. 组件后续每一次更新，判断依赖的状态值是否改变，如果改变，则重新创建新的函数堆，赋值给 xxx；但是如果，依赖的状态没有更新「或者没有设置依赖“[]”」
             则xXx获取的一直是第一次创建的函数堆，不会创建新的函数出来！！
         3. 或者说，基于 useCallback，可以始终获取第一次创建函数的堆内存地址（或者说函数的引用）

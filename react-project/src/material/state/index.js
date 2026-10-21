@@ -1,7 +1,7 @@
 import { Button, Typography } from "@material-ui/core"
-import React, { useState } from "react"
+import React from "react"
 
-export class UseStateDemo extends React.Component {
+export class StateDemo extends React.Component {
     state = {
         x: 10,
         y: 5,

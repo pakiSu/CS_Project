@@ -11,8 +11,10 @@ import { ContextConsumer } from '../context';
 import { UseRefTest, RefClassTest } from './useRef';
 import { UseStateTest, UseStateTest1, UseStateTest2, UseStateTest3, UseStateTest4 } from './useState';
 import { CustomHookTest } from "./customHook";
-import { UseStateDemo } from "./useState/index1";
+import { StateDemo } from "./state";
 import  VoteClass  from "./componet-communication/class/vote";
+import VoteFunction from './componet-communication/function/vote';
+import { VirtualDOMDemo } from './virtualDOM'
 
 
 function MaterralTest(props) {
@@ -25,7 +27,7 @@ function MaterralTest(props) {
             <UseStateTest3 {...props} />
             <UseStateTest4 x={5} y={10} /> */}
 
-            {/* <UseStateDemo {...props}/> */}
+            {/* <StateDemo {...props} /> */}
 
             {/* <UseEffectDemo {...props}/> */}
 
@@ -55,7 +57,11 @@ function MaterralTest(props) {
             {/* <CustomHookTest {...props}/> */}
 
             {/* component communication */}
-            <VoteClass {...props}/>
+            {/* <VoteClass {...props}/>
+            <VoteFunction {...props}/> */}
+
+
+            <VirtualDOMDemo />
         </React.Fragment>
     )
 }
