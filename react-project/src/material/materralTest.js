@@ -14,8 +14,8 @@ import { CustomHookTest } from "./customHook";
 import { StateDemo } from "./state";
 import  VoteClass  from "./componet-communication/class/vote";
 import VoteFunction from './componet-communication/function/vote';
-import { VirtualDOMDemo } from './virtualDOM'
-
+import { VirtualDOMDemo } from './virtualDOM';
+import PropsDemo from './props';
 
 function MaterralTest(props) {
     
@@ -60,8 +60,13 @@ function MaterralTest(props) {
             {/* <VoteClass {...props}/>
             <VoteFunction {...props}/> */}
 
-
-            <VirtualDOMDemo />
+            {/* <VirtualDOMDemo /> */}
+            
+            {/* <PropsDemo {...props} title="React">
+                <span slot="footer">Children Footer</span>
+                <span slot="header">Children Header</span>
+            </PropsDemo> */}
+            
         </React.Fragment>
     )
 }
